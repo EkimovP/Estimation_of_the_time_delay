@@ -159,6 +159,8 @@ class GuiProgram(Ui_Dialog):
         self.bit_counts = None
         # Случайная последовательность битов (0 и 1)
         self.bits = None
+        # Время передачи (с)
+        self.time_transfer = None
 
         # Временная задержка в исследуемом канале (в миллисекундах)
         self.delay_ms = None
@@ -208,9 +210,8 @@ class GuiProgram(Ui_Dialog):
         frequency_deviations = float(self.lineEdit_frequency_deviations.text())
 
         self.bits = np.random.randint(0, 2, self.bit_counts)
-        # Время передачи (с)
-        time_transfer = self.bit_counts // self.bit_rate
-        self.time_counts = np.linspace(0, time_transfer, time_transfer * self.sampling_rate)
+        self.time_transfer = self.bit_counts // self.bit_rate
+        self.time_counts = np.linspace(0, self.time_transfer, self.time_transfer * self.sampling_rate)
 
         # Генерация сигнала
         signal_generator = SignalGenerator(self.time_counts, self.bits, self.sampling_rate, self.bit_rate,
@@ -295,7 +296,7 @@ class GuiProgram(Ui_Dialog):
         drawer.graph_signal(self.graph_2, time_counts_for_inv_signal, self.noise_investigated_signal)
         drawer.add_vertical_lines(
             graph=self.graph_1,
-            positions=[self.delay_ms / 1000, (len(self.time_counts) * 2 - self.clippings_ms) / 1000],
+            positions=[self.delay_ms / 1000, self.time_transfer - self.clippings_ms / 1000],
             colors=[BORDER_COLOR, BORDER_COLOR]
         )
 
